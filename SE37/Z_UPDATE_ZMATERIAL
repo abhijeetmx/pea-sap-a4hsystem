@@ -1,0 +1,37 @@
+
+FUNCTION z_update_zmaterial
+  IMPORTING
+    VALUE(is_zmaterial) TYPE zmaterial
+  EXPORTING
+    VALUE(ev_success) TYPE boolean
+  EXCEPTIONS
+    entry_not_found
+    update_failed.
+
+
+
+
+  DATA: lv_matnr TYPE matnr.
+
+  lv_matnr = is_zmaterial-matnr.
+
+  " Check if material exists
+  SELECT SINGLE @abap_true
+    FROM zmaterial
+    WHERE matnr = @lv_matnr
+    INTO @DATA(lv_exists).
+
+  IF lv_exists = abap_true.
+    " Update existing entry
+    MODIFY zmaterial FROM is_zmaterial.
+      IF sy-subrc = 0.
+        ev_success = abap_true.
+        COMMIT WORK.
+      ELSE.
+        RAISE update_failed.
+      ENDIF.
+  ELSE.
+    RAISE entry_not_found.
+  ENDIF.
+
+ENDFUNCTION.
