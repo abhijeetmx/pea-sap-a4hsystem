@@ -1,0 +1,41 @@
+
+FUNCTION Z_ZMATERIAL_READ
+  IMPORTING
+    VALUE(IV_MATNR) TYPE ZMATNR_DE OPTIONAL
+  EXPORTING
+    VALUE(ET_ZMATERIAL) TYPE ZMATERIAL
+  TABLES
+    T_ZMATERIAL LIKE ZMATERIAL
+  EXCEPTIONS
+    NO_DATA_FOUND.
+
+
+
+
+  DATA: IT_ZMATERIAL TYPE STANDARD TABLE OF ZMATERIAL,
+        WA_ZMATERIAL TYPE ZMATERIAL.
+   " Clear the output table
+  CLEAR T_ZMATERIAL.
+
+  " Fetch materials
+  IF iv_matnr IS INITIAL.
+    SELECT *
+      FROM zmaterial
+      INTO TABLE @T_ZMATERIAL.
+  ELSE.
+    SELECT *
+      FROM zmaterial
+      INTO TABLE @T_ZMATERIAL
+      WHERE matnr = @iv_matnr.
+  ENDIF.
+
+  " Error handling
+  IF sy-subrc <> 0.
+    RAISE NO_DATA_FOUND.
+  ENDIF.
+
+
+  WRITE: / 'Input MATNR:', iv_matnr.
+  WRITE: / 'Number of records:', lines( T_ZMATERIAL ).
+
+ENDFUNCTION.
