@@ -1,0 +1,55 @@
+
+FUNCTION z_zmaterial_create
+  IMPORTING
+    VALUE(is_zmaterial) TYPE zmaterial_structure
+  EXPORTING
+    VALUE(ev_success) TYPE boolean
+    VALUE(ev_message) TYPE bapi_msg
+  EXCEPTIONS
+    entry_exists
+    insert_failed.
+
+
+
+
+
+ DATA: ls_zmaterial TYPE zmaterial,
+       lv_matnr TYPE matnr.
+
+
+  " Check if the material already exists
+  SELECT SINGLE @abap_true
+    FROM zmaterial
+    WHERE MATNR IS NOT INITIAL AND matnr = @is_zmaterial-matnr
+    INTO @DATA(lv_exists).
+
+  IF lv_exists = abap_true.
+    RAISE entry_exists.
+  ENDIF.
+
+  " Move imported structure to database table structure
+  MOVE-CORRESPONDING is_zmaterial TO ls_zmaterial.
+
+
+  CALL FUNCTION 'NUMBER_GET_NEXT'
+    EXPORTING
+      nr_range_nr = '01'
+      object      = 'ZMATNR_NR'
+    IMPORTING
+      number      = lv_matnr
+    EXCEPTIONS
+      OTHERS      = 1.
+
+   ls_zmaterial-matnr = lv_matnr.
+  " Insert new entry
+  INSERT zmaterial FROM ls_zmaterial.
+
+  IF sy-subrc = 0.
+    ev_success = abap_true.
+    ev_message = |{ lv_matnr }{ ' is created!' }|.
+  ELSE.
+    RAISE insert_failed.
+  ENDIF.
+
+
+ENDFUNCTION.
