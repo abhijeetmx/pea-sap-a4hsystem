@@ -1,0 +1,99 @@
+Z_IMPORT_MATERIAL_CSV
+*&---------------------------------------------------------------------*
+*& Report Z_IMPORT_MATERIAL_CSV
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT Z_IMPORT_MATERIAL_CSV.
+
+TYPES: BEGIN OF ty_material,
+  matnr TYPE matnr,
+  mtart TYPE mtart,
+  maktx TYPE maktx,
+  meins TYPE meins,
+  matkl TYPE matkl,
+  gewei TYPE gewei,
+  voleh TYPE voleh,
+  groes TYPE groes,
+  ean11 TYPE ean11,
+  spart TYPE spart,
+  ekgrp TYPE ekgrp,
+  ersda TYPE ersda,
+  ernam TYPE ernam,
+  laeda TYPE datum,
+  aenam TYPE aenam,
+END OF ty_material.
+
+DATA: gt_material TYPE TABLE OF ty_material,
+      gs_material TYPE ty_material,
+      gt_file     TYPE TABLE OF string,
+      gv_filename TYPE string.
+
+PARAMETERS: p_file TYPE string LOWER CASE.
+
+START-OF-SELECTION.
+"  PERFORM import_csv.
+  PERFORM create_test_data.
+  PERFORM insert_data.
+
+FORM import_csv.
+  gv_filename = p_file.
+  CALL FUNCTION 'GUI_UPLOAD'
+    EXPORTING
+      filename = gv_filename
+    TABLES
+      data_tab = gt_file.
+
+  LOOP AT gt_file ASSIGNING FIELD-SYMBOL(<fs_line>) FROM 2.
+    SPLIT <fs_line> AT ',' INTO gs_material-matnr
+                               gs_material-mtart
+                               gs_material-maktx
+                               gs_material-meins
+                               gs_material-matkl
+                               gs_material-gewei
+                               gs_material-voleh
+                               gs_material-groes
+                               gs_material-ean11
+                               gs_material-spart
+                               gs_material-ekgrp.
+    APPEND gs_material TO gt_material.
+  ENDLOOP.
+ENDFORM.
+
+FORM create_test_data.
+  DATA: lv_index TYPE i,
+        lv_matnr TYPE string.
+
+  DO 100 TIMES.
+    lv_index = sy-index.
+    CLEAR gs_material.
+    lv_matnr = |MAT{ lv_index }|.
+    CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
+      EXPORTING
+        input  = lv_matnr
+      IMPORTING
+        output = gs_material-matnr.
+    gs_material-mtart = 'FERT'.
+    gs_material-maktx = |Test Material { lv_index }|.
+    gs_material-meins = 'EA'.
+    gs_material-matkl = 'TEST'.
+    gs_material-gewei = 'KG'.
+    gs_material-voleh = 'L'.
+    gs_material-groes = '10x10x10'.
+    gs_material-ean11 = |123456789{ lv_index }|.
+    gs_material-spart = '00'.
+    gs_material-ekgrp = 'E01'.
+    APPEND gs_material TO gt_material.
+  ENDDO.
+ENDFORM.
+
+FORM insert_data.
+  INSERT zmaterial FROM TABLE gt_material.
+  IF sy-subrc = 0.
+    COMMIT WORK.
+    MESSAGE 'Data imported successfully' TYPE 'S'.
+  ELSE.
+    ROLLBACK WORK.
+    MESSAGE 'Error importing data' TYPE 'E'.
+  ENDIF.
+ENDFORM.
