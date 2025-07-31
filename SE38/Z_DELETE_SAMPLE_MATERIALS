@@ -1,0 +1,42 @@
+Z_DELETE_SAMPLE_MATERIALS
+
+*&---------------------------------------------------------------------*
+*& Report Z_DELETE_SAMPLE_MATERIALS
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT Z_DELETE_SAMPLE_MATERIALS.
+
+
+DATA: lv_matnr TYPE ZMATNR_DE,
+      lv_index     TYPE c LENGTH 18 VALUE '100000000200000002',
+      lv_numeric   TYPE I,
+      lv_next      TYPE c LENGTH 18.
+
+lv_numeric = lv_index.
+
+lv_next = lv_numeric.
+
+START-OF-SELECTION.
+
+  " Loop through the range of material numbers that were inserted
+  lv_index = 100000000200000002.
+  DO 50 TIMES.
+
+
+    " Construct the material number based on your previous logic
+    lv_matnr = lv_next.  " Adjust this line based on your MATNR generation logic
+
+    " Delete the entry from ZMATERIAL
+    DELETE FROM zmaterial WHERE matnr = lv_matnr.
+
+    IF sy-subrc = 0.
+      WRITE: / 'Deleted material:', lv_matnr.
+    ELSE.
+      WRITE: / 'Material not found:', lv_matnr.
+    ENDIF.
+    lv_numeric = lv_numeric + 1.
+    lv_next = lv_numeric.
+  ENDDO.
+
+  COMMIT WORK. 
