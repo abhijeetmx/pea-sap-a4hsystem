@@ -1,0 +1,87 @@
+*&---------------------------------------------------------------------*
+*& Report Z_INSERT_SAMPLE_MATERIALS
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT z_insert_sample_materials.
+DATA: lv_index_char TYPE char10.
+
+TYPES: BEGIN OF ty_material,
+         matnr TYPE matnr,
+         mtart TYPE mtart,
+         maktx TYPE maktx,
+         meins TYPE meins,
+         matkl TYPE matkl,
+         gewei TYPE gewei,
+         voleh TYPE voleh,
+         groes TYPE groes,
+         ean11 TYPE ean11,
+         spart TYPE spart,
+         ekgrp TYPE ekgrp,
+         ersda TYPE ersda,
+         ernam TYPE ernam,
+         laeda TYPE datum,
+         aenam TYPE aenam,
+       END OF ty_material.
+
+DATA: lt_materials TYPE TABLE OF ty_material,
+      ls_material  TYPE ty_material,
+      lv_index     TYPE i,
+      lv_matnr     TYPE matnr.
+
+START-OF-SELECTION.
+
+  " Generate 50 sample materials
+  DO 50 TIMES.
+    lv_index = sy-index.
+
+    " Get next material number from number range
+    CALL FUNCTION 'NUMBER_GET_NEXT'
+      EXPORTING
+        nr_range_nr = '01'
+        object      = 'ZMATNR_NR'
+      IMPORTING
+        number      = lv_matnr
+      EXCEPTIONS
+        OTHERS      = 1.
+
+    IF sy-subrc <> 0.
+      MESSAGE 'Error getting next material number' TYPE 'E'.
+    ENDIF.
+
+    ls_material-matnr = lv_matnr.
+    ls_material-mtart = 'ROH'.  " Raw material
+    ls_material-maktx = |High-Grade Steel Alloy { lv_index }|.
+    ls_material-meins = 'KG'.
+    ls_material-matkl = 'METAL'.
+    ls_material-gewei = 'KG'.
+    ls_material-voleh = 'L'.
+    ls_material-groes = '100X100X10'.
+    " Convert lv_index to character and use ALPHA conversion
+    lv_index_char = lv_index.
+    CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
+      EXPORTING
+        input  = lv_index_char
+      IMPORTING
+        output = lv_index_char.
+    ls_material-ean11 = |4012345{ lv_index_char }|.
+    ls_material-spart = '01'.  " Product division
+    ls_material-ekgrp = 'M01'.  " Purchasing group
+    ls_material-ersda = sy-datum.
+    ls_material-ernam = sy-uname.
+    ls_material-laeda = sy-datum.
+    ls_material-aenam = sy-uname.
+
+    APPEND ls_material TO lt_materials.
+  ENDDO.
+
+  " Insert materials into ZMATERIAL table
+  MODIFY zmaterial FROM TABLE lt_materials.
+
+  IF sy-subrc = 0.
+    COMMIT WORK.
+    WRITE: / 'Successfully inserted 50 sample materials.'.
+  ELSE.
+    ROLLBACK WORK.
+    WRITE: / 'Error occurred while inserting materials.'.
+  ENDIF. 
