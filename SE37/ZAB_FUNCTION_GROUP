@@ -1,0 +1,16 @@
+function-pool SAPLZAB_FUNCTION_GROUP.
+*******************************************************************
+*   System-defined Include-files.                                 *
+*******************************************************************
+
+  INCLUDE LZAB_FUNCTION_GROUPUXX.            " Function Modules
+
+*******************************************************************
+*   User-defined Include-files (if necessary).                    *
+*******************************************************************
+* INCLUDE LZAB_FUNCTION_GROUPF...            " Subroutines
+* INCLUDE LZAB_FUNCTION_GROUPO...            " PBO-Modules
+* INCLUDE LZAB_FUNCTION_GROUPI...            " PAI-Modules
+* INCLUDE LZAB_FUNCTION_GROUPE...            " Events
+* INCLUDE LZAB_FUNCTION_GROUPP...            " Local class implement.
+* INCLUDE LZAB_FUNCTION_GROUPT99.            " ABAP Unit tests
