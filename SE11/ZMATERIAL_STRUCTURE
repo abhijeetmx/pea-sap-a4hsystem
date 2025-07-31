@@ -1,0 +1,20 @@
+@EndUserText.label : 'STRUCTURE TYPE FOR ZMATERIAL'
+@AbapCatalog.enhancementCategory : #NOT_EXTENSIBLE
+define structure zmaterial_structure {
+matnr : matnr;
+mtart : mtart;
+maktx : maktx;
+meins : meins;
+matkl : matkl;
+gewei : gewei;
+voleh : voleh;
+groes : groes;
+ean11 : ean11;
+spart : spart;
+ekgrp : ekgrp;
+ersda : ersda;
+ernam : ernam;
+laeda : datum;
+aenam : aenam;
+
+}
