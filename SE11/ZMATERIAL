@@ -1,0 +1,26 @@
+ZMATERIAL
+
+
+@EndUserText.label : 'CUSTOM MATERIAL TABLE'
+@AbapCatalog.enhancementCategory : #EXTENSIBLE_ANY
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #A
+@AbapCatalog.dataMaintenance : #ALLOWED
+define table zmaterial {
+key matnr : zmatnr_de not null;
+mtart     : mtart;
+maktx     : maktx;
+meins     : meins;
+matkl     : matkl;
+gewei     : gewei;
+voleh     : voleh;
+groes     : groes;
+ean11     : ean11;
+spart     : spart;
+ekgrp     : ekgrp;
+ersda     : ersda;
+ernam     : ernam;
+laeda     : datum;
+aenam     : aenam;
+
+}
